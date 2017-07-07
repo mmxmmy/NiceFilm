@@ -1,0 +1,47 @@
+{
+    "query": {
+        "function_score": {
+            "query": { 
+               "bool": {
+                 "must":[
+                    {"multi_match": {
+                        "query": "来日方长",
+                        "fields":["username"],
+                        "minimum_should_match": "81%",
+                        "type": "best_fields",
+                        "tie_breaker":0
+                    }}
+                 ],
+                 "should": [
+                    {"multi_match": {
+                        "query": "来日方长",
+                        "fields":["username.shingles"],
+                        "type": "best_fields",
+                        "tie_breaker":0,
+                        "boost": 1.3
+                    }}
+                    , {"multi_match": {
+                        "query": "来日方长",
+                        "fields":["username.sgt"],
+                        "type": "best_fields",
+                        "tie_breaker":0,
+                        "boost": 2
+                    }}
+                 ]
+
+              }
+            }
+            , "script_score": {
+                "script": {
+                    "lang": "painless",
+                    "inline": "_score * doc[\"rank\"].value"
+                }
+            }
+
+        }
+    },
+    
+    "size":100,
+    "from":0,
+  "_source": ["id", "username","username.py", "rank"]
+}

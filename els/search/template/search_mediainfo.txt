@@ -1,0 +1,45 @@
+{
+    "query": {
+        "function_score": {
+            "query": { 
+               "bool": {
+                 "must":[
+                    {"multi_match": {
+                        "query": "忙里偷闲",
+                        "fields":["title"],
+                        "minimum_should_match": "81%",
+                        "type": "best_fields",
+                        "tie_breaker":0,
+                        "boost": 1
+                    }}
+                 ],
+                 "should": [
+                    {"multi_match": {
+                        "query": "忙里偷闲",
+                        "fields":["title.shingles"],
+                        "type": "best_fields",
+                        "tie_breaker":0,
+                        "boost": 1.3
+                    }}
+                    , {"multi_match": {
+                        "query": "忙里偷闲",
+                        "fields":["title.sgt"],
+                        "type": "best_fields",
+                        "tie_breaker":0,
+                        "boost": 2
+                    }}
+                 ]
+              }
+            }
+            , "script_score": {
+                "script": {
+                    "lang": "painless",
+                    "inline": "_score * doc[\"rank\"].value"
+                }
+            }
+        }
+    },
+    "size":100,
+    "from":0,
+  "_source": ["id", "media_type", "title", "rank"]
+}

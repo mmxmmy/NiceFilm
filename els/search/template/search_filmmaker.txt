@@ -1,0 +1,42 @@
+{
+    "query": {
+        "function_score": {
+            "query": { 
+               "bool": {
+                 "must":[
+                    {"multi_match": {
+                        "query": "杨恭",
+                        "fields":["name","alias_cn","alias_en"],
+                        "minimum_should_match": "81%",
+                        "type": "best_fields",
+                        "tie_breaker":0
+                    }}
+                 ],
+                 "should": [
+                    {"multi_match": {
+                        "query": "杨恭",
+                        "fields":["name.shingles","alias_cn.shingles","alias_en.shingles"],
+                        "type": "best_fields",
+                        "tie_breaker":0,
+                        "boost": 1.3
+                    }}
+                    , {"multi_match": {
+                        "query": "杨恭",
+                        "fields":["name.sgt","alias_cn.sgt","alias_en.sgt"],
+                        "type": "best_fields",
+                        "tie_breaker":0,
+                        "boost": 2
+                    }}
+                 ],
+                 "must_not": {
+                    "term":{"forbidden":1}
+                 }
+              }
+            }
+            , "score_mode": "avg"
+        }
+    },
+    "size":100,
+    "from":0,
+  "_source": ["fmid", "name", "alias_en", "alias_cn", "occupation", "cover_image"]
+}
